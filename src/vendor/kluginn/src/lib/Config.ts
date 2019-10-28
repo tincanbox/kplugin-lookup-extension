@@ -53,11 +53,15 @@ export default class __Config extends Submodule {
   fetch(){
     var c = this.core.$k.plugin.app.getConfig(this.core.plugin_id)
     try{
-      if(c.json && typeof c.json == "string"){
-        var ps = JSON.parse(c.json);
-        c.json = ps;
+      if(c.json){
+        if(typeof c.json == "string"){
+          var ps = JSON.parse(c.json);
+          c.json = ps;
+        }else{
+          // DONT RUN TWICE.
+        }
       }else{
-        // DONT RUN TWICE.
+        c.json = {};
       }
     }catch(e){
       console.error("kluginn", e.message)

@@ -58,7 +58,7 @@ import SharedLib from '../lib/shared.js';
 
   function update(e){
     var lks = cybozu.data.page.FORM_DATA.lookups;
-    var tbl = S.config.json.table;
+    var tbl = S.config.json.table || [];
     for(var a of tbl){
       var fcode = a.target;
       var fid = shared.find_scheme_field_id(fcode);
@@ -69,11 +69,25 @@ import SharedLib from '../lib/shared.js';
         var tapp = lk.targetApp;
         var mcond = match_target_cond(a, cond);
         if(mcond){
-          mcond.value.value = _.template(a.value)({
-            record: e.record,
-            target_app: tapp,
-            lookup: lk,
-          });
+          try{
+            if(a.value){
+              mcond.value.value = _.template(a.value)({
+                record: e.record,
+                target_app: tapp,
+                lookup: lk,
+                config: a,
+              });
+            }else{
+              mcond.op = "NOT_EQ";
+            }
+          }catch(e){
+            mcond.op = "NOT_EQ";
+            K.dialog({
+              title: "Error",
+              type: "error",
+              text: "lookup-extension: ParseError: " + e.message
+            });
+          }
         }
       }
     }
